@@ -29,10 +29,6 @@ public class ChatService {
         this.responseExtractor = responseExtractor;
     }
 
-    /**
-     * @param requestedMaxTokens limite de tokens de saida vindo da request;
-     *                            se null, usa o default de anthropic.max-tokens
-     */
     public String sendMessage(String userMessage, Long requestedMaxTokens) {
         MessageCreateParams params = requestFactory.build(userMessage, requestedMaxTokens);
         log.debug("Enviando mensagem para o modelo {}", params.model());
