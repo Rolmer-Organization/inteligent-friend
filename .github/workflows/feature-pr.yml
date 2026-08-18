@@ -1,0 +1,34 @@
+name: Abrir PR de feature para develop
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  abrir-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Criar PR (se ainda não existir)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          EXISTING=$(gh pr list --base develop --head "$BRANCH" --state open --json number --jq '.[0].number')
+
+          if [ -n "$EXISTING" ]; then
+            echo "PR #$EXISTING já existe para $BRANCH -> develop, não será gerado um novo PR."
+            exit 0
+          fi
+
+          gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "$BRANCH → develop" \
+            --body "PR automático criado pelo evento de push em feature/*."
