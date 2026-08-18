@@ -91,6 +91,13 @@ Resposta esperada:
 
 `maxTokens` é opcional; se omitido, usa o valor default (`anthropic.max-tokens`).
 
+## Deploy
+
+Todo merge em `master` builda a imagem, publica na ECR e atualiza a EC2 de
+produção automaticamente (`.github/workflows/deploy.yml`, via OIDC + SSM, sem
+chaves de longa duração guardadas no GitHub). Setup único de infraestrutura
+em [DEPLOY.md](DEPLOY.md).
+
 ## Roadmap
 
 Status atual: **Fase 3 concluída.**
