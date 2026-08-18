@@ -79,6 +79,8 @@ Status atual: **Fase 2 concluída.**
 2. ✅ Exposição via HTTP — mensagem passa a vir dinamicamente do corpo da requisição.
 3. ⬜ Clean code — divisão em classes e métodos mais especializados.
 4. ⬜ Multi-mensagens — conversas com histórico, persistido em Redis.
+5. ⬜ Inclui tool_uses.
+
 
 ## Pendências conhecidas
 

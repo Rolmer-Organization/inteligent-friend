@@ -3,16 +3,14 @@ package com.rolmer.inteligent_friend.chat;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.models.messages.Message;
 import com.anthropic.models.messages.MessageCreateParams;
-import com.anthropic.models.messages.TextBlock;
-import com.rolmer.inteligent_friend.config.AnthropicProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
-
 /**
- * Encapsula a comunicacao com a Messages API da Anthropic.
+ * Orquestra o envio de uma mensagem a Claude: delega a montagem do request
+ * a {@link ChatMessageRequestFactory}, chama a Messages API e delega a
+ * extracao do texto a {@link ChatResponseExtractor}.
  */
 @Service
 public class ChatService {
@@ -20,36 +18,27 @@ public class ChatService {
     private static final Logger log = LoggerFactory.getLogger(ChatService.class);
 
     private final AnthropicClient anthropicClient;
-    private final AnthropicProperties anthropicProperties;
+    private final ChatMessageRequestFactory requestFactory;
+    private final ChatResponseExtractor responseExtractor;
 
-    public ChatService(AnthropicClient anthropicClient, AnthropicProperties anthropicProperties) {
+    public ChatService(AnthropicClient anthropicClient,
+                        ChatMessageRequestFactory requestFactory,
+                        ChatResponseExtractor responseExtractor) {
         this.anthropicClient = anthropicClient;
-        this.anthropicProperties = anthropicProperties;
+        this.requestFactory = requestFactory;
+        this.responseExtractor = responseExtractor;
     }
 
     /**
      * @param requestedMaxTokens limite de tokens de saida vindo da request;
-     *                           se null, usa o default de anthropic.max-tokens
+     *                            se null, usa o default de anthropic.max-tokens
      */
     public String sendMessage(String userMessage, Long requestedMaxTokens) {
-        long maxTokens = resolveMaxTokens(requestedMaxTokens);
-        log.debug("Enviando mensagem para o modelo {} (maxTokens={})", anthropicProperties.model(), maxTokens);
-
-        MessageCreateParams params = MessageCreateParams.builder()
-                .model(anthropicProperties.model())
-                .maxTokens(maxTokens)
-                .addUserMessage(userMessage)
-                .build();
+        MessageCreateParams params = requestFactory.build(userMessage, requestedMaxTokens);
+        log.debug("Enviando mensagem para o modelo {}", params.model());
 
         Message response = anthropicClient.messages().create(params);
 
-        return response.content().stream()
-                .flatMap(block -> block.text().stream())
-                .map(TextBlock::text)
-                .collect(Collectors.joining());
-    }
-
-    private long resolveMaxTokens(Long requestedMaxTokens) {
-        return requestedMaxTokens != null ? requestedMaxTokens : anthropicProperties.maxTokens();
+        return responseExtractor.extractText(response);
     }
 }
