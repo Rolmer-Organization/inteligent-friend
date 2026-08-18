@@ -1,0 +1,5 @@
+# Perfil usado pelos testes automatizados (@ActiveProfiles("test") ou quando
+# o Spring Boot ativa "test" automaticamente em @SpringBootTest).
+# Usa o modelo mais barato para nao gerar custo desnecessario nas execucoes de teste.
+anthropic:
+  model: claude-haiku-4-5

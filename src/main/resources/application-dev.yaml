@@ -1,0 +1,8 @@
+# Perfil de desenvolvimento local.
+# Usa um modelo mais barato/rapido para agilizar a iteracao, e loga mais detalhes.
+anthropic:
+  model: claude-haiku-4-5
+
+logging:
+  level:
+    com.rolmer.inteligent_friend: DEBUG

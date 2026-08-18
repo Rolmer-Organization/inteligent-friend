@@ -1,0 +1,10 @@
+# Perfil de producao.
+# Usa o modelo de melhor qualidade (herdado do application.yaml base) e loga
+# apenas o necessario.
+anthropic:
+  model: claude-opus-5
+
+logging:
+  level:
+    root: WARN
+    com.rolmer.inteligent_friend: INFO
