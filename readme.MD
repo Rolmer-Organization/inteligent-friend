@@ -55,6 +55,26 @@ Configuração por perfil (`application-{profile}.yaml`), com `local` como defau
 
 3. A API sobe em `http://localhost:8080`.
 
+## Como rodar com Docker
+
+1. Copie `.env.example` para `.env` e preencha sua API key:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Suba API + Redis com um comando:
+
+   ```bash
+   docker compose up --build
+   ```
+
+3. A API sobe em `http://localhost:8080`, perfil `prod` por padrão (ajustável via `SPRING_PROFILES_ACTIVE` no `.env`).
+
+O `Dockerfile` usa build multi-stage (Maven só na etapa de build; a imagem final roda apenas o JRE, como usuário não-root). O `docker-compose.yml` já sobe um Redis junto, em preparação para a Fase 4 — hoje ele fica ocioso, sem ser usado pelo código ainda.
+
+> Usa Podman em vez de Docker? `podman compose up --build` funciona da mesma forma.
+
 ## Como testar
 
 ```bash
@@ -73,16 +93,16 @@ Resposta esperada:
 
 ## Roadmap
 
-Status atual: **Fase 2 concluída.**
+Status atual: **Fase 3 concluída.**
 
 1. ✅ Integração inicial — mensagem fixa enviada à API da Anthropic, código dividido em pacotes/classes.
 2. ✅ Exposição via HTTP — mensagem passa a vir dinamicamente do corpo da requisição.
-3. ⬜ Clean code — divisão em classes e métodos mais especializados.
+3. ✅ Clean code — `ChatService` dividido em `ChatMessageRequestFactory` (monta o request) e `ChatResponseExtractor` (extrai o texto da resposta), com testes unitários para cada um.
 4. ⬜ Multi-mensagens — conversas com histórico, persistido em Redis.
 5. ⬜ Inclui tool_uses.
 
 
 ## Pendências conhecidas
 
-- Sem testes automatizados, Docker/Docker Compose e CI ainda — previstos para fases futuras.
-- `spring-ai-starter-vector-store-redis` já está no `pom.xml` mas ainda não é utilizado — dependência adicionada em preparação para a Fase 4 (Redis).
+- Sem CI de build/testes ainda — previsto para uma fase futura.
+- `spring-ai-starter-vector-store-redis` já está no `pom.xml` e o Redis já sobe via `docker-compose.yml`, mas ainda não é utilizado pelo código — preparação para a Fase 4.
